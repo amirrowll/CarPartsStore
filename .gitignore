@@ -21,3 +21,4 @@ CarPartsStore.API/appsettings.Development.json
 Thumbs.db
 .vscode/
 .idea/
+CarPartsStore.API/appsettings.Production.json

@@ -108,7 +108,7 @@ namespace CarPartsStore.API.Data
                 .OnDelete(DeleteBehavior.SetNull);
 
             // Seed initial data
-            SeedData(modelBuilder);
+            // SeedData(modelBuilder);
         }
 
         private void SeedData(ModelBuilder modelBuilder)
