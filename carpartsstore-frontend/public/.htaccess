@@ -1,0 +1,189 @@
+# Apache Configuration for Pinpart Store - SEO Optimized
+
+# Enable rewrite engine
+RewriteEngine On
+
+# Force HTTPS
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+# Remove trailing slash
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)/$ /$1 [R=301,L]
+
+# Redirect www to non-www (or vice versa based on preference)
+RewriteCond %{HTTP_HOST} ^www\.pinpartstore\.com [NC]
+RewriteRule ^(.*)$ https://pinparts.ir/$1 [R=301,L]
+
+# Cache control for static assets - SEO Optimized
+<IfModule mod_expires.c>
+  ExpiresActive On
+  
+  # Default cache
+  ExpiresDefault "access plus 1 month"
+  
+  # HTML - shorter cache for dynamic content
+  ExpiresByType text/html "access plus 1 hour"
+  
+  # Images - long cache
+  ExpiresByType image/jpg "access plus 1 year"
+  ExpiresByType image/jpeg "access plus 1 year"
+  ExpiresByType image/gif "access plus 1 year"
+  ExpiresByType image/png "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType image/x-icon "access plus 1 year"
+  
+  # CSS, JavaScript - medium cache
+  ExpiresByType text/css "access plus 6 months"
+  ExpiresByType text/javascript "access plus 6 months"
+  ExpiresByType application/javascript "access plus 6 months"
+  ExpiresByType application/x-javascript "access plus 6 months"
+  
+  # Fonts - long cache
+  ExpiresByType font/ttf "access plus 1 year"
+  ExpiresByType font/otf "access plus 1 year"
+  ExpiresByType font/woff "access plus 1 year"
+  ExpiresByType font/woff2 "access plus 1 year"
+  ExpiresByType application/font-woff "access plus 1 year"
+  
+  # Media files
+  ExpiresByType video/mp4 "access plus 1 year"
+  ExpiresByType video/webm "access plus 1 year"
+  ExpiresByType audio/mpeg "access plus 1 year"
+  
+  # Web fonts
+  ExpiresByType application/vnd.ms-fontobject "access plus 1 year"
+  ExpiresByType application/x-font-ttf "access plus 1 year"
+  ExpiresByType application/x-font-opentype "access plus 1 year"
+  ExpiresByType application/x-font-woff "access plus 1 year"
+  
+  # Other
+  ExpiresByType application/pdf "access plus 1 month"
+  ExpiresByType application/xml "access plus 1 month"
+  ExpiresByType application/json "access plus 1 month"
+  ExpiresByType application/atom+xml "access plus 1 hour"
+  ExpiresByType application/rss+xml "access plus 1 hour"
+</IfModule>
+
+# Cache-Control headers for better performance
+<IfModule mod_headers.c>
+  # Cache static assets
+  <FilesMatch "\.(jpg|jpeg|png|gif|webp|svg|ico|css|js|woff|woff2|ttf|eot)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  
+  # Cache HTML pages
+  <FilesMatch "\.(html|htm)$">
+    Header set Cache-Control "public, max-age=3600, must-revalidate"
+  </FilesMatch>
+  
+  # Don't cache dynamic files
+  <FilesMatch "\.(php|cgi|pl|py)$">
+    Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+  </FilesMatch>
+</IfModule>
+
+# Compression - Improved for better performance
+<IfModule mod_deflate.c>
+  # Force compression for mangled headers
+  <IfModule mod_setenvif.c>
+    <IfModule mod_headers.c>
+      SetEnvIfNoCase ^(Accept-EncodXng|X-cept-Encoding|X{15}|~{15}|-{15})$ ^((gzip|deflate)\s*,?\s*)+|[X~-]{4,13}$ HAVE_Accept-Encoding
+      RequestHeader append Accept-Encoding "gzip,deflate" env=HAVE_Accept-Encoding
+    </IfModule>
+  </IfModule>
+  
+  # Compress all output labeled with one of the following MIME-types
+  AddOutputFilterByType DEFLATE application/atom+xml \
+                                  application/javascript \
+                                  application/json \
+                                  application/ld+json \
+                                  application/manifest+json \
+                                  application/rdf+xml \
+                                  application/rss+xml \
+                                  application/schema+json \
+                                  application/vnd.geo+json \
+                                  application/vnd.ms-fontobject \
+                                  application/x-font-ttf \
+                                  application/x-javascript \
+                                  application/x-web-app-manifest+json \
+                                  application/xhtml+xml \
+                                  application/xml \
+                                  font/eot \
+                                  font/opentype \
+                                  image/bmp \
+                                  image/svg+xml \
+                                  image/vnd.microsoft.icon \
+                                  image/x-icon \
+                                  text/cache-manifest \
+                                  text/css \
+                                  text/html \
+                                  text/javascript \
+                                  text/plain \
+                                  text/vcard \
+                                  text/vnd.rim.location.xloc \
+                                  text/vtt \
+                                  text/x-component \
+                                  text/x-cross-domain-policy \
+                                  text/xml
+  
+  # Remove browser bugs
+  <IfModule mod_headers.c>
+    Header append Vary User-Agent env=!dont-vary
+  </IfModule>
+</IfModule>
+
+# Security headers
+<IfModule mod_headers.c>
+  # XSS Protection
+  Header set X-XSS-Protection "1; mode=block"
+  
+  # Prevent MIME type sniffing
+  Header set X-Content-Type-Options "nosniff"
+  
+  # Referrer Policy
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+  
+  # Permissions Policy
+  Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+  
+  # Frame Options
+  Header set X-Frame-Options "SAMEORIGIN"
+</IfModule>
+
+# Handle Single Page Application (React Router)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !\.(css|js|png|jpg|jpeg|gif|ico|svg|webp|pdf)$
+RewriteRule ^ index.html [L]
+
+# Custom 404 page
+ErrorDocument 404 /index.html
+
+# Block access to sensitive files
+<FilesMatch "^\.">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
+
+<FilesMatch "\.(env|config|log|sql|bak|old)$">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
+
+# Allow access to sitemap and robots
+<Files "sitemap.xml">
+  Order allow,deny
+  Allow from all
+</Files>
+
+<Files "robots.txt">
+  Order allow,deny
+  Allow from all
+</Files>
+
+<Files "google-site-verification.html">
+  Order allow,deny
+  Allow from all
+</Files>

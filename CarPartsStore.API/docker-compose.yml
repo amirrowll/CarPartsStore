@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: carpartsstore-postgres
+    environment:
+      POSTGRES_DB: carpartsstore
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ChangeMe123!}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./Scripts/PostgreSQL_Migration.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - carpartsstore-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: carpartsstore-redis
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - carpartsstore-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: carpartsstore-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: "Host=postgres;Database=carpartsstore;Username=postgres;Password=${POSTGRES_PASSWORD:-ChangeMe123!}"
+      ConnectionStrings__Redis: "redis:6379"
+      Jwt__Key: ${JWT_KEY:-YourSecureJwtKeyHereMinimum32Characters}
+      Jwt__Issuer: "CarPartsStore.API"
+      Jwt__Audience: "CarPartsStore.Client"
+      Jwt__ExpireDays: "7"
+      FileStorage__UploadPath: "/app/uploads"
+    volumes:
+      - uploads_volume:/app/uploads
+    ports:
+      - "5000:8080"
+      - "5001:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - carpartsstore-network
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    container_name: carpartsstore-nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - uploads_volume:/app/uploads:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - app
+    networks:
+      - carpartsstore-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  uploads_volume:
+
+networks:
+  carpartsstore-network:
+    driver: bridge

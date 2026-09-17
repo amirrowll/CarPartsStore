@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /search-test
+Disallow: /test
+
+# Sitemap داینامیک از بکاند - هر محصول جدید خودکار اضافه میشه
+Sitemap: https://pinparts.ir/sitemap.xml
+
+# Crawl-delay برای جلوگیری از overload
+Crawl-delay: 1

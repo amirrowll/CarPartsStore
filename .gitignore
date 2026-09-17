@@ -1,0 +1,23 @@
+# Frontend
+carpartsstore-frontend/node_modules/
+carpartsstore-frontend/dist/
+carpartsstore-frontend/build/
+carpartsstore-frontend/.env
+carpartsstore-frontend/.env.local
+carpartsstore-frontend/.env.production
+carpartsstore-frontend/.env*.local
+
+# Backend (.NET)
+CarPartsStore.API/bin/
+CarPartsStore.API/obj/
+CarPartsStore.API/.vs/
+CarPartsStore.API/*.user
+CarPartsStore.API/appsettings.Development.json
+
+# General
+*.user
+*.suo
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
