@@ -21,7 +21,8 @@ import {
   Security,
   Help,
   Brightness4,
-  Language
+  Language,
+  PhoneCallback
 } from '@mui/icons-material';
 
 const AdminLayoutNew: React.FC = () => {
@@ -35,6 +36,12 @@ const AdminLayoutNew: React.FC = () => {
       icon: <Dashboard />,
       path: '/admin/dashboard',
       color: 'from-blue-500 to-blue-600'
+    },
+    {
+      title: 'درخواست‌های تماس و استعلام',
+      icon: <PhoneCallback />,
+      path: '/admin/call-requests',
+      color: 'from-rose-500 to-red-600'
     },
     {
       title: 'محصولات',

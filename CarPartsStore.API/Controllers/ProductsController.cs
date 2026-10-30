@@ -19,7 +19,6 @@ namespace CarPartsStore.API.Controllers
         }
 
         [HttpGet]
-        [ResponseCache(Duration = 60, VaryByQueryKeys = new[] { "*" })]
         public async Task<IActionResult> GetProducts([FromQuery] ProductFilterDto filter)
         {
             try
@@ -34,7 +33,6 @@ namespace CarPartsStore.API.Controllers
         }
 
         [HttpGet("{id}")]
-        [ResponseCache(Duration = 300, VaryByQueryKeys = new[] { "id" })]
         public async Task<IActionResult> GetProduct(int id)
         {
             try
@@ -53,7 +51,6 @@ namespace CarPartsStore.API.Controllers
         }
 
         [HttpGet("popular")]
-        [ResponseCache(Duration = 120, VaryByQueryKeys = new[] { "count" })]
         public async Task<IActionResult> GetPopularProducts([FromQuery] int count = 10)
         {
             try
@@ -68,7 +65,6 @@ namespace CarPartsStore.API.Controllers
         }
 
         [HttpGet("most-viewed")]
-        [ResponseCache(Duration = 120, VaryByQueryKeys = new[] { "count" })]
         public async Task<IActionResult> GetMostViewedProducts([FromQuery] int count = 10)
         {
             try
@@ -83,7 +79,6 @@ namespace CarPartsStore.API.Controllers
         }
 
         [HttpGet("by-brand/{brand}")]
-        [ResponseCache(Duration = 120, VaryByQueryKeys = new[] { "brand", "count" })]
         public async Task<IActionResult> GetProductsByBrand(string brand, [FromQuery] int count = 20)
         {
             try
@@ -112,7 +107,6 @@ namespace CarPartsStore.API.Controllers
         }
 
         [HttpGet("popular-tags")]
-        [ResponseCache(Duration = 300, VaryByQueryKeys = new[] { "count" })]
         public async Task<IActionResult> GetPopularTags([FromQuery] int count = 20)
         {
             try
@@ -132,26 +126,45 @@ namespace CarPartsStore.API.Controllers
         {
             try
             {
-                var form = await Request.ReadFormAsync();
-                
-                // Parse product data from form
-                var createProductDto = new CreateProductDto
+                CreateProductDto createProductDto;
+                IFormFile? file = null;
+
+                if (Request.ContentType?.Contains("application/json") == true)
                 {
-                    Name = form["name"].ToString() ?? string.Empty,
-                    Description = form["description"].ToString() ?? string.Empty,
-                    CategoryId = int.Parse(form["categoryId"].ToString() ?? "1"),
-                    ImageUrl = form["imageUrl"].ToString() ?? string.Empty,
-                    Tags = form["tags"].ToString()?.Split(',', StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>(),
-                    Brand = form["brand"].ToString() ?? string.Empty,
-                    PartNumber = form["partNumber"].ToString() ?? string.Empty,
-                    CompatibleCars = form["compatibleCars"].ToString() ?? string.Empty,
-                    DisplayOrder = int.Parse(form["displayOrder"].ToString() ?? "0"),
-                    IsFeatured = bool.Parse(form["isFeatured"].ToString() ?? "false"),
-                    IsActive = bool.Parse(form["isActive"].ToString() ?? "true")
-                };
+                    using var reader = new StreamReader(Request.Body);
+                    var body = await reader.ReadToEndAsync();
+                    createProductDto = System.Text.Json.JsonSerializer.Deserialize<CreateProductDto>(body, new System.Text.Json.JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    }) ?? new CreateProductDto();
+                }
+                else
+                {
+                    var form = await Request.ReadFormAsync();
+                    createProductDto = new CreateProductDto
+                    {
+                        Name = form.ContainsKey("name") ? form["name"].ToString() ?? string.Empty : string.Empty,
+                        Description = form.ContainsKey("description") ? form["description"].ToString() ?? string.Empty : string.Empty,
+                        CategoryId = form.ContainsKey("categoryId") && int.TryParse(form["categoryId"].ToString(), out var catId) ? catId : 1,
+                        ImageUrl = form.ContainsKey("imageUrl") ? form["imageUrl"].ToString() ?? string.Empty : string.Empty,
+                        Tags = form.ContainsKey("tags") && !string.IsNullOrWhiteSpace(form["tags"].ToString())
+                            ? form["tags"].ToString()!.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(t => t.Trim()).ToArray()
+                            : Array.Empty<string>(),
+                        Brand = form.ContainsKey("brand") ? form["brand"].ToString() ?? string.Empty : string.Empty,
+                        PartNumber = form.ContainsKey("partNumber") ? form["partNumber"].ToString() ?? string.Empty : string.Empty,
+                        CompatibleCars = form.ContainsKey("compatibleCars") ? form["compatibleCars"].ToString() ?? string.Empty : string.Empty,
+                        CarBrand = form.ContainsKey("carBrand") ? form["carBrand"].ToString() ?? string.Empty : string.Empty,
+                        CarModel = form.ContainsKey("carModel") ? form["carModel"].ToString() ?? string.Empty : string.Empty,
+                        Material = form.ContainsKey("material") ? form["material"].ToString() ?? string.Empty : string.Empty,
+                        Warranty = form.ContainsKey("warranty") ? form["warranty"].ToString() ?? string.Empty : string.Empty,
+                        DisplayOrder = form.ContainsKey("displayOrder") && int.TryParse(form["displayOrder"].ToString(), out var dispOrder) ? dispOrder : 0,
+                        IsFeatured = form.ContainsKey("isFeatured") && bool.TryParse(form["isFeatured"].ToString(), out var isFeat) ? isFeat : false,
+                        IsActive = form.ContainsKey("isActive") && bool.TryParse(form["isActive"].ToString(), out var isAct) ? isAct : true
+                    };
+                    file = form.Files.FirstOrDefault(f => f.Name == "imageFile");
+                }
 
                 // Handle file upload
-                var file = form.Files.FirstOrDefault(f => f.Name == "imageFile");
                 if (file != null && file.Length > 0)
                 {
                     var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "products");
@@ -184,26 +197,45 @@ namespace CarPartsStore.API.Controllers
         {
             try
             {
-                var form = await Request.ReadFormAsync();
-                
-                // Parse product data from form
-                var updateProductDto = new UpdateProductDto
+                UpdateProductDto updateProductDto;
+                IFormFile? file = null;
+
+                if (Request.ContentType?.Contains("application/json") == true)
                 {
-                    Name = form["name"].ToString(),
-                    Description = form["description"].ToString(),
-                    CategoryId = form["categoryId"].Count > 0 ? int.Parse(form["categoryId"].ToString() ?? "1") : (int?)null,
-                    ImageUrl = form["imageUrl"].ToString(),
-                    Tags = form["tags"].ToString()?.Split(',', StringSplitOptions.RemoveEmptyEntries) ?? Array.Empty<string>(),
-                    Brand = form["brand"].ToString(),
-                    PartNumber = form["partNumber"].ToString(),
-                    CompatibleCars = form["compatibleCars"].ToString(),
-                    DisplayOrder = form["displayOrder"].Count > 0 ? int.Parse(form["displayOrder"].ToString() ?? "0") : (int?)null,
-                    IsFeatured = form["isFeatured"].Count > 0 ? bool.Parse(form["isFeatured"].ToString() ?? "false") : (bool?)null,
-                    IsActive = form["isActive"].Count > 0 ? bool.Parse(form["isActive"].ToString() ?? "true") : (bool?)null
-                };
+                    using var reader = new StreamReader(Request.Body);
+                    var body = await reader.ReadToEndAsync();
+                    updateProductDto = System.Text.Json.JsonSerializer.Deserialize<UpdateProductDto>(body, new System.Text.Json.JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    }) ?? new UpdateProductDto();
+                }
+                else
+                {
+                    var form = await Request.ReadFormAsync();
+                    updateProductDto = new UpdateProductDto
+                    {
+                        Name = form.ContainsKey("name") ? form["name"].ToString() : null,
+                        Description = form.ContainsKey("description") ? form["description"].ToString() : null,
+                        CategoryId = form.ContainsKey("categoryId") && int.TryParse(form["categoryId"].ToString(), out var uCatId) ? uCatId : null,
+                        ImageUrl = form.ContainsKey("imageUrl") ? form["imageUrl"].ToString() : null,
+                        Tags = form.ContainsKey("tags") 
+                            ? (string.IsNullOrWhiteSpace(form["tags"].ToString()) ? Array.Empty<string>() : form["tags"].ToString()!.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(t => t.Trim()).ToArray())
+                            : null,
+                        Brand = form.ContainsKey("brand") ? form["brand"].ToString() : null,
+                        PartNumber = form.ContainsKey("partNumber") ? form["partNumber"].ToString() : null,
+                        CompatibleCars = form.ContainsKey("compatibleCars") ? form["compatibleCars"].ToString() : null,
+                        CarBrand = form.ContainsKey("carBrand") ? form["carBrand"].ToString() : null,
+                        CarModel = form.ContainsKey("carModel") ? form["carModel"].ToString() : null,
+                        Material = form.ContainsKey("material") ? form["material"].ToString() : null,
+                        Warranty = form.ContainsKey("warranty") ? form["warranty"].ToString() : null,
+                        DisplayOrder = form.ContainsKey("displayOrder") && int.TryParse(form["displayOrder"].ToString(), out var uDispOrder) ? uDispOrder : null,
+                        IsFeatured = form.ContainsKey("isFeatured") && bool.TryParse(form["isFeatured"].ToString(), out var uIsFeat) ? uIsFeat : null,
+                        IsActive = form.ContainsKey("isActive") && bool.TryParse(form["isActive"].ToString(), out var uIsAct) ? uIsAct : null
+                    };
+                    file = form.Files.FirstOrDefault(f => f.Name == "imageFile");
+                }
 
                 // Handle file upload
-                var file = form.Files.FirstOrDefault(f => f.Name == "imageFile");
                 if (file != null && file.Length > 0)
                 {
                     var uploadsFolder = Path.Combine(_environment.WebRootPath, "uploads", "products");

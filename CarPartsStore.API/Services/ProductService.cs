@@ -32,8 +32,12 @@ namespace CarPartsStore.API.Services
         {
             var query = _context.Products
                 .Include(p => p.Category)
-                .Where(p => p.IsActive)
                 .AsQueryable();
+
+            if (filter.IsActive.HasValue)
+            {
+                query = query.Where(p => p.IsActive == filter.IsActive.Value);
+            }
 
             // Apply filters
             if (!string.IsNullOrEmpty(filter.Search))
@@ -58,11 +62,6 @@ namespace CarPartsStore.API.Services
             if (filter.IsFeatured.HasValue)
             {
                 query = query.Where(p => p.IsFeatured == filter.IsFeatured.Value);
-            }
-
-            if (filter.IsActive.HasValue)
-            {
-                query = query.Where(p => p.IsActive == filter.IsActive.Value);
             }
 
             if (!string.IsNullOrEmpty(filter.Brand))
@@ -114,12 +113,18 @@ namespace CarPartsStore.API.Services
                 query = query.Where(p => p.Warranty.ToLower().Contains(filter.Warranty.ToLower()));
             }
 
-            // Apply sorting
+            // Apply sorting (with secondary sort by CreatedAt to ensure determinism)
             query = filter.SortBy?.ToLower() switch
             {
-                "displayorder" => filter.SortDescending ? query.OrderByDescending(p => p.DisplayOrder) : query.OrderBy(p => p.DisplayOrder),
-                "name" => filter.SortDescending ? query.OrderByDescending(p => p.Name) : query.OrderBy(p => p.Name),
-                _ => filter.SortDescending ? query.OrderByDescending(p => p.CreatedAt) : query.OrderBy(p => p.CreatedAt)
+                "displayorder" => filter.SortDescending 
+                    ? query.OrderByDescending(p => p.DisplayOrder).ThenByDescending(p => p.CreatedAt) 
+                    : query.OrderBy(p => p.DisplayOrder).ThenByDescending(p => p.CreatedAt),
+                "name" => filter.SortDescending 
+                    ? query.OrderByDescending(p => p.Name).ThenByDescending(p => p.CreatedAt) 
+                    : query.OrderBy(p => p.Name).ThenByDescending(p => p.CreatedAt),
+                _ => filter.SortDescending 
+                    ? query.OrderByDescending(p => p.CreatedAt) 
+                    : query.OrderBy(p => p.CreatedAt)
             };
 
             // Get total count
@@ -195,16 +200,16 @@ namespace CarPartsStore.API.Services
                 return null;
 
             // Update properties if provided
-            if (!string.IsNullOrEmpty(updateProductDto.Name))
+            if (updateProductDto.Name != null)
                 product.Name = updateProductDto.Name;
 
-            if (!string.IsNullOrEmpty(updateProductDto.Description))
+            if (updateProductDto.Description != null)
                 product.Description = updateProductDto.Description;
 
             if (updateProductDto.CategoryId.HasValue)
                 product.CategoryId = updateProductDto.CategoryId.Value;
 
-            if (!string.IsNullOrEmpty(updateProductDto.ImageUrl))
+            if (updateProductDto.ImageUrl != null)
                 product.ImageUrl = updateProductDto.ImageUrl;
 
             if (updateProductDto.Tags != null)
@@ -216,25 +221,25 @@ namespace CarPartsStore.API.Services
             if (updateProductDto.AdditionalImages != null)
                 product.AdditionalImages = updateProductDto.AdditionalImages;
 
-            if (!string.IsNullOrEmpty(updateProductDto.Brand))
+            if (updateProductDto.Brand != null)
                 product.Brand = updateProductDto.Brand;
 
-            if (!string.IsNullOrEmpty(updateProductDto.PartNumber))
+            if (updateProductDto.PartNumber != null)
                 product.PartNumber = updateProductDto.PartNumber;
 
-            if (!string.IsNullOrEmpty(updateProductDto.CompatibleCars))
+            if (updateProductDto.CompatibleCars != null)
                 product.CompatibleCars = updateProductDto.CompatibleCars;
 
-            if (!string.IsNullOrEmpty(updateProductDto.CarBrand))
+            if (updateProductDto.CarBrand != null)
                 product.CarBrand = updateProductDto.CarBrand;
 
-            if (!string.IsNullOrEmpty(updateProductDto.CarModel))
+            if (updateProductDto.CarModel != null)
                 product.CarModel = updateProductDto.CarModel;
 
-            if (!string.IsNullOrEmpty(updateProductDto.Material))
+            if (updateProductDto.Material != null)
                 product.Material = updateProductDto.Material;
 
-            if (!string.IsNullOrEmpty(updateProductDto.Warranty))
+            if (updateProductDto.Warranty != null)
                 product.Warranty = updateProductDto.Warranty;
 
             if (updateProductDto.DisplayOrder.HasValue)
@@ -288,22 +293,30 @@ namespace CarPartsStore.API.Services
 
         public async Task<List<ProductDto>> GetProductsByBrandAsync(string brand, int count = 20)
         {
-            // Map brand names for compatibility
-            string brandFilter = brand.ToLower();
-            
-            // Handle different brand name variations
-            if (brandFilter == "chinese")
-                brandFilter = "chinese";
-            else if (brandFilter == "saipa")
-                brandFilter = "saipa";
-            else if (brandFilter == "irankhodro")
-                brandFilter = "irankhodro";
-            else if (brandFilter == "iran khodro")
-                brandFilter = "irankhodro";
+            string brandFilter = (brand ?? string.Empty).Trim().ToLower();
+            string alternateFilter = brandFilter switch
+            {
+                "saipa" => "سایپا",
+                "سایپا" => "saipa",
+                "irankhodro" => "ایران خودرو",
+                "ایران خودرو" => "irankhodro",
+                "chinese" => "چینی",
+                "چینی" => "chinese",
+                _ => brandFilter
+            };
 
-            // Search in Brand field (case-insensitive)
+            // Search in Brand, CarBrand, CompatibleCars, or Name
             var products = await _context.Products
-                .Where(p => p.IsActive && p.Brand.ToLower() == brandFilter)
+                .Where(p => p.IsActive && (
+                    p.Brand.ToLower().Contains(brandFilter) || 
+                    p.CarBrand.ToLower().Contains(brandFilter) || 
+                    p.CompatibleCars.ToLower().Contains(brandFilter) ||
+                    p.Name.ToLower().Contains(brandFilter) ||
+                    p.Brand.ToLower().Contains(alternateFilter) || 
+                    p.CarBrand.ToLower().Contains(alternateFilter) || 
+                    p.CompatibleCars.ToLower().Contains(alternateFilter) ||
+                    p.Name.ToLower().Contains(alternateFilter)
+                ))
                 .OrderByDescending(p => p.DisplayOrder)
                 .ThenByDescending(p => p.CreatedAt)
                 .Take(count)

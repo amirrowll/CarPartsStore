@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Tag, Car, Wrench, Shield, Phone, Package, CheckCircle } from 'lucide-react';
+import { Tag, Car, Wrench, Shield, Phone, Package, CheckCircle, Truck, ShieldCheck } from 'lucide-react';
+import { WhatsApp, Telegram } from '@mui/icons-material';
 import { productApi } from '../services/api';
 import type { Product } from '../types';
 import SEO from '../components/SEO';
 import { SEO_CONFIG, generateBreadcrumbData, generateFAQData } from '../utils/seoConfig';
+import CallRequestModal from '../components/CallRequestModal';
 
 const API_BASE = import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://127.0.0.1:5000';
 const SITE_URL = 'https://pinparts.ir';
@@ -70,6 +72,7 @@ const ProductDetailPage: React.FC = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [imgError, setImgError] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -198,13 +201,6 @@ const ProductDetailPage: React.FC = () => {
                 )}
               </div>
 
-              {/* توضیحات */}
-              {product.description && (
-                <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
-                  {product.description}
-                </p>
-              )}
-
               {/* مشخصات فنی - مهم برای SEO */}
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 space-y-3">
                 <h2 className="text-sm font-bold text-gray-700 uppercase tracking-wide">مشخصات فنی</h2>
@@ -216,16 +212,6 @@ const ProductDetailPage: React.FC = () => {
                       <div>
                         <span className="font-medium text-gray-700">سازگار با: </span>
                         <span className="text-gray-800">{product.compatibleCars}</span>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {product.material && (
-                    <div className="flex items-start gap-3 text-sm text-gray-600">
-                      <Wrench className="h-4 w-4 mt-0.5 text-blue-500 shrink-0" />
-                      <div>
-                        <span className="font-medium text-gray-700">جنس: </span>
-                        <span className="text-gray-800">{product.material}</span>
                       </div>
                     </div>
                   )}
@@ -290,41 +276,85 @@ const ProductDetailPage: React.FC = () => {
                   <h3 className="text-sm font-bold text-gray-700 mb-2">مناسب برای خودروهای:</h3>
                   <div className="flex flex-wrap gap-1.5">
                     {product.compatibleCars.split(',').map((car, i) => (
-                      <span key={i} className="px-2 py-1 bg-green-50 text-green-700 text-xs rounded-full border border-green-200 hover:bg-green-100 transition-colors">
-                        🚗 {car.trim()}
+                      <span key={i} className="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50 text-green-700 text-xs rounded-full border border-green-200 hover:bg-green-100 transition-colors">
+                        <Car className="h-3 w-3 text-green-600" />
+                        <span>{car.trim()}</span>
                       </span>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* دکمههای تماس */}
-              <div className="flex flex-col gap-3 sm:flex-row pt-2">
-                <a
-                  href="https://wa.me/989196408805"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 flex items-center justify-center gap-2 rounded-full bg-green-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-green-600 shadow-md"
-                >
-                  <span>💬</span>
-                  استعلام قیمت از واتساپ
-                </a>
-                <a
-                  href="tel:09196408805"
-                  className="flex-1 flex items-center justify-center gap-2 rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-700 shadow-md"
-                >
-                  <Phone className="h-4 w-4" />
-                  تماس برای خرید
-                </a>
+              {/* باکس فروش عمده و دکمه‌های استعلام */}
+              <div className="rounded-2xl border border-red-500/30 bg-red-950/20 p-4 space-y-3">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-red-400 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                    فروش منحصراً عمده و همکاری
+                  </span>
+                  <span className="text-slate-400">تیراژ و کارتنی</span>
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  <button
+                    onClick={() => setIsModalOpen(true)}
+                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 px-6 py-3.5 text-sm font-bold text-white transition shadow-lg shadow-red-950/50"
+                  >
+                    <Package className="h-4 w-4" />
+                    <span>ثبت استعلام قیمت و پیش‌فاکتور</span>
+                  </button>
+                  <a
+                    href="tel:09196408805"
+                    className="w-full flex items-center justify-center gap-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 px-6 py-3.5 text-sm font-bold text-white transition shadow-md font-mono"
+                  >
+                    <Phone className="h-4 w-4 text-red-400" />
+                    <span>تماس فوری: ۰۹۱۹۶۴۰۸۸۰۵</span>
+                  </a>
+                </div>
+
+                <div className="flex items-center justify-between pt-2 border-t border-red-900/30 text-[11px] text-slate-400">
+                  <a
+                    href="https://chat.whatsapp.com/CGCLTGEoouVEfgybJMlWw8?mode=wwc"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-emerald-500 hover:underline flex items-center gap-1"
+                  >
+                    <WhatsApp className="text-sm" />
+                    <span>عضویت در گروه عمده واتساپ پین‌پارت</span>
+                  </a>
+                  <a
+                    href="https://t.me/Pinparts1"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sky-400 hover:underline flex items-center gap-1"
+                  >
+                    <Telegram className="text-sm" />
+                    <span>کانال تلگرام @Pinparts1</span>
+                  </a>
+                </div>
               </div>
 
-              <p className="text-xs text-gray-400 text-center">
-                📦 ارسال به سراسر کشور | ✅ کیفیت تضمینی
-              </p>
+              <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-400 text-center">
+                <span className="flex items-center gap-1.5">
+                  <Truck className="h-3.5 w-3.5 text-amber-400" />
+                  ارسال روزانه باربری به سراسر کشور
+                </span>
+                <span className="text-slate-600">|</span>
+                <span className="flex items-center gap-1.5">
+                  <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
+                  کیفیت فابریک و استاندارد تضمینی
+                </span>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      <CallRequestModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        productName={product.name}
+      />
     </>
   );
 };

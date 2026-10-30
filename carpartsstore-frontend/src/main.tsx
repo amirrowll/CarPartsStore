@@ -2,7 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App.tsx';
-import { registerServiceWorker } from './utils/registerSW';
+import { unregisterServiceWorker } from './utils/registerSW';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -10,7 +10,5 @@ createRoot(document.getElementById('root')!).render(
   </StrictMode>
 );
 
-// Register service worker for offline support and caching
-if (process.env.NODE_ENV === 'production') {
-  registerServiceWorker();
-}
+// Unregister service worker to prevent stale chunk cache issues
+unregisterServiceWorker();

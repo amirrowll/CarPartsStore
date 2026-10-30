@@ -22,7 +22,7 @@ namespace CarPartsStore.API.Controllers
         [ResponseCache(Duration = 3600)]
         public async Task<IActionResult> GetSitemap()
         {
-            var siteUrl = _configuration["SiteUrl"] ?? "https://pinpartstore.com";
+            var siteUrl = _configuration["SiteUrl"] ?? "https://pinparts.ir";
 
             var products = await _context.Products
                 .Where(p => p.IsActive)

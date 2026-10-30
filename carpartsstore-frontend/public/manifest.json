@@ -1,13 +1,13 @@
 {
-  "name": "Pinpart Store",
-  "short_name": "Pinpart",
-  "description": "فروشگاه تخصصی قطعات یدکی خودرو",
+  "name": "پین‌ پارت | خارجات ماشین و لوازم یدکی خودرو",
+  "short_name": "پین پارت",
+  "description": "مرکز تخصصی پخش عمده خارجات ماشین، خار و بست خودرو، پیچ و مهره و اتصالات چراغ برق تهران",
   "lang": "fa-IR",
   "dir": "rtl",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#3b82f6",
+  "theme_color": "#dc2626",
   "orientation": "portrait",
   "scope": "/",
   "categories": ["shopping", "automotive"],
@@ -21,6 +21,12 @@
     {
       "src": "/favicon-32x32.png",
       "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon-48x48.png",
+      "sizes": "48x48",
       "type": "image/png",
       "purpose": "any"
     },

@@ -156,7 +156,7 @@ namespace CarPartsStore.API.DTOs
         public string? Search { get; set; }
         public int? CategoryId { get; set; }
         public bool? IsFeatured { get; set; }
-        public bool? IsActive { get; set; } = true;
+        public bool? IsActive { get; set; }
         public string? Brand { get; set; }
         public string? CarBrand { get; set; } // Chinese, Saipa, IranKhodro, Other
         public string? CarModel { get; set; }

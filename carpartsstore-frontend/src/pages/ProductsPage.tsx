@@ -2,7 +2,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { categoryApi, productApi } from '../services/api';
 import type { Product, Category } from '../types';
-import { Star } from 'lucide-react';
+import { Star, Package } from 'lucide-react';
 
 // Helper function to complete image URLs
 const completeImageUrl = (url: string | undefined): string => {
@@ -161,7 +161,7 @@ const ProductsPage: React.FC = () => {
 
         {filteredProducts.length === 0 ? (
           <div className="mt-10 text-center py-16 bg-gray-50 rounded-2xl">
-            <div className="text-4xl mb-4">📦</div>
+            <Package className="h-12 w-12 text-slate-400 mx-auto mb-4" />
             <h3 className="text-xl font-bold text-gray-700 mb-2">محصولی یافت نشد</h3>
             <p className="text-gray-500">در این دسته بندی هنوز محصولی اضافه نشده است.</p>
           </div>
@@ -193,9 +193,6 @@ const ProductsPage: React.FC = () => {
                 <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-1">
                   {product.name}
                 </h3>
-                <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                  {product.description || 'توضیحات محصول'}
-                </p>
                 
                 {/* Tags and Compatibility */}
                 <div className="space-y-3 mb-4">

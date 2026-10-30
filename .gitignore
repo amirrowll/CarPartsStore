@@ -13,6 +13,20 @@ CarPartsStore.API/obj/
 CarPartsStore.API/.vs/
 CarPartsStore.API/*.user
 CarPartsStore.API/appsettings.Development.json
+CarPartsStore.API/appsettings.Production.json
+*.db
+
+# Archives & Temporary Artifacts
+*.zip
+*.tar.gz
+extracted_items_page1/
+extracted_pages/
+test_crops/
+
+# Credentials & Sensitive Scripts
+scripts/askpass.*
+scripts/ssh_cmd.sh
+scripts/scp_to.sh
 
 # General
 *.user
@@ -21,4 +35,3 @@ CarPartsStore.API/appsettings.Development.json
 Thumbs.db
 .vscode/
 .idea/
-CarPartsStore.API/appsettings.Production.json

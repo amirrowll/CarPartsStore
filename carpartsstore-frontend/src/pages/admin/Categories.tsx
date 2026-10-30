@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import api from '../../services/api';
 import { 
   Folder, Plus, Edit, Trash2, Eye, Grid, 
-  Search, Filter, ChevronLeft, ChevronRight 
+  Search, Filter, ChevronLeft, ChevronRight, AlertTriangle 
 } from 'lucide-react';
 
 interface Category {
@@ -369,8 +369,9 @@ const Categories: React.FC = () => {
             <p className="text-gray-600 mb-6">
               آیا مطمئن هستید که میخواهید دسته بندی "{deleteModal.categoryName}" را حذف کنید؟
               {deleteModal.categoryId && categories.find(c => c.id === deleteModal.categoryId)?.productCount > 0 && (
-                <span className="block mt-2 text-red-600 text-sm">
-                  ⚠️ این دسته بندی دارای محصول فعال است و نمیتوان آن را حذف کرد.
+                <span className="flex items-center gap-1 mt-2 text-red-600 text-sm">
+                  <AlertTriangle className="h-4 w-4 shrink-0" />
+                  <span>این دسته‌بندی دارای محصول فعال است و نمی‌توان آن را حذف کرد.</span>
                 </span>
               )}
             </p>

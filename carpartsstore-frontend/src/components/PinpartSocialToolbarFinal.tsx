@@ -1,48 +1,68 @@
 import React, { useState } from 'react';
-import { WhatsApp, Telegram, Instagram, Message, Close, ChevronLeft, OpenInNew } from '@mui/icons-material';
+import { WhatsApp, Telegram, Instagram, Phone, Close, OpenInNew, Chat, SupportAgent } from '@mui/icons-material';
+import { MessageSquare, PhoneCall, Sparkles } from 'lucide-react';
+import CallRequestModal from './CallRequestModal';
 
 const PinpartSocialToolbarFinal: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeChannel, setActiveChannel] = useState<string | null>(null);
 
   const socialChannels = [
     {
       id: 'whatsapp1',
-      name: 'کانال اول',
-      icon: <WhatsApp fontSize="small" />,
+      name: 'گروه واتساپ عمده‌فروشی',
+      desc: 'عضویت همکاران و اعلام موجودی روزانه',
+      icon: <WhatsApp className="!w-5 !h-5" />,
       url: 'https://chat.whatsapp.com/CGCLTGEoouVEfgybJMlWw8?mode=wwc',
-      color: 'bg-green-500 hover:bg-green-600',
-      textColor: 'text-green-700',
-    },
-    {
-      id: 'whatsapp2',
-      name: 'کانال دوم',
-      icon: <WhatsApp fontSize="small" />,
-      url: 'https://chat.whatsapp.com/KswfWmJSRAsGI5TAHVO1Hi',
-      color: 'bg-green-600 hover:bg-green-700',
-      textColor: 'text-green-800',
+      color: 'bg-emerald-600 hover:bg-emerald-500',
+      tag: 'پیشنهادی'
     },
     {
       id: 'telegram',
-      name: 'کانال تلگرام',
-      icon: <Telegram fontSize="small" />,
-      url: 'https://t.me/pinparts',
-      color: 'bg-blue-500 hover:bg-blue-600',
-      textColor: 'text-blue-700',
+      name: 'کانال تلگرام پین‌پارت',
+      desc: 'مشاهده کاتالوگ و اقلام جدید @Pinparts1',
+      icon: <Telegram className="!w-5 !h-5" />,
+      url: 'https://t.me/Pinparts1',
+      color: 'bg-sky-600 hover:bg-sky-500',
+      tag: 'کانال رسمی'
     },
     {
       id: 'instagram',
-      name: 'صفحه اینستاگرام',
-      icon: <Instagram fontSize="small" />,
-      url: 'https://instagram.com/pinparts',
-      color: 'bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600',
-      textColor: 'text-pink-700',
+      name: 'صفحه اینستاگرام پین‌پارت',
+      desc: 'ویدیوهای معرفی قطعات و تولیدات @pinparts',
+      icon: <Instagram className="!w-5 !h-5" />,
+      url: 'https://instagram.com/direct/t/pinparts',
+      color: 'bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500',
+      tag: 'اینستاگرام'
+    },
+    {
+      id: 'sales_call',
+      name: 'تماس مستقیم واحد فروش عمده',
+      desc: '۰۹۱۹۶۴۰۸۸۰۵ (مشاوره و استعلام تلفنی)',
+      icon: <Phone className="!w-5 !h-5" />,
+      url: 'tel:09196408805',
+      color: 'bg-red-600 hover:bg-red-500',
+      tag: 'تماس فوری'
+    },
+    {
+      id: 'manager_wa',
+      name: 'واتساپ مستقیم مدیریت',
+      desc: '۰۹۳۰۸۳۶۸۰۸۹ (قراردادها و نمایندگی شهرستان)',
+      icon: <WhatsApp className="!w-5 !h-5" />,
+      url: 'https://wa.me/989308368089?text=%D8%B3%D9%84%D8%A7%D9%85%D8%8C%20%D8%AC%D9%87%D8%AA%20%D9%87%D9%85%DA%A9%D8%A7%D8%B1%DB%8C%20%D8%B9%D9%85%D8%AF%D9%87%20%D9%BE%DB%8C%D9%86%E2%80%8C%D9%BE%D8%A7%D8%B1%D8%AA%20%D9%BE%DB%8C%D8%A7%D9%85%20%D9%85%DB%8C%E2%80%8C%D8%AF%D9%87%D9%85.',
+      color: 'bg-emerald-700 hover:bg-emerald-600',
+      tag: 'مدیریت بازرگانی'
     }
   ];
 
   const handleChannelClick = (channelId: string, url: string) => {
     setActiveChannel(channelId);
-    window.open(url, '_blank');
+    if (url.startsWith('tel:')) {
+      window.location.href = url;
+    } else {
+      window.open(url, '_blank');
+    }
   };
 
   const handleClose = () => {
@@ -52,161 +72,159 @@ const PinpartSocialToolbarFinal: React.FC = () => {
 
   return (
     <>
-      {/* Floating Toolbar Button */}
-      <div className="fixed left-4 bottom-4 z-[9999]">
+      {/* Floating Pill Button - اشاره صریح به کانال‌ها و ارتباطات */}
+      <div className="fixed left-4 sm:left-6 bottom-5 z-[9999]" dir="ltr">
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="group flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-full shadow-2xl hover:shadow-3xl hover:scale-110 transition-all duration-300 relative overflow-hidden"
-          aria-label="کانال های ارتباطی پین پارت"
+          className="group flex items-center gap-2.5 p-1.5 pr-4 bg-gradient-to-r from-slate-950 via-slate-900 to-red-950 text-white rounded-full shadow-2xl border-2 border-red-500/80 hover:border-red-400 hover:scale-105 active:scale-95 transition-all duration-300 relative overflow-hidden"
+          aria-label="کانال‌ها و راه‌های ارتباطی پین‌پارت"
         >
-          {/* Background Animation */}
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-          
-          {/* Logo/Icon */}
-          <div className="relative z-10">
+          {/* Ambient Glow */}
+          <div className="absolute inset-0 bg-red-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm pointer-events-none"></div>
+
+          {/* Logo / Close Badge */}
+          <div className="relative z-10 w-11 h-11 bg-white rounded-full flex items-center justify-center shadow-md shrink-0 overflow-hidden">
             {isOpen ? (
-              <Close className="!w-7 !h-7" />
+              <Close className="!w-6 !h-6 text-slate-900" />
             ) : (
-              <div className="flex flex-col items-center">
-                <Message className="!w-6 !h-6 mb-1 group-hover:rotate-12 transition-transform" />
-                <div className="text-[8px] font-bold tracking-wider">PINPART</div>
-              </div>
+              <img 
+                src="/logo.png" 
+                alt="Pinpart Logo" 
+                className="w-full h-full object-cover rounded-full"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = '/PinpartStore.JPEG';
+                }}
+              />
             )}
           </div>
 
-          {/* Pulse Animation */}
-          {!isOpen && (
-            <div className="absolute inset-0 border-2 border-blue-400 rounded-full animate-ping opacity-20"></div>
-          )}
-        </button>
-
-        {/* Tooltip when closed */}
-        {!isOpen && (
-          <div className="absolute left-20 bottom-4 bg-gradient-to-r from-gray-900 to-gray-800 text-white text-sm px-4 py-2 rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none">
-            <div className="flex items-center gap-2">
-              <ChevronLeft className="!w-4 !h-4" />
-              <div>
-                <div className="font-bold">کانال های پین پارت</div>
-                <div className="text-xs text-blue-300">دسترسی سریع</div>
-              </div>
+          {/* Explicit Label & Status - اشاره واضح به کانال‌ها و ارتباط‌ها */}
+          <div className="relative z-10 text-right pr-1" dir="rtl">
+            <div className="flex items-center gap-1.5">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span className="font-black text-white text-xs sm:text-sm tracking-tight whitespace-nowrap">
+                کانال‌ها و ارتباط سریع
+              </span>
             </div>
-            <div className="absolute right-full top-1/2 transform -translate-y-1/2 border-8 border-transparent border-r-gray-800"></div>
+            <div className="text-[10px] text-red-300 font-medium whitespace-nowrap">
+              واتساپ • تلگرام • استعلام قیمت
+            </div>
           </div>
-        )}
+        </button>
       </div>
 
-      {/* Expanded Toolbar */}
+      {/* Expanded Toolbar Drawer - طراحی تیره لوکس با UX شفاف */}
       {isOpen && (
-        <div className="fixed left-4 bottom-24 z-[9998] animate-fade-in">
-          <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden w-80 max-h-[80vh] overflow-y-auto">
-            {/* Header with Pinpart Branding */}
-            <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-4 relative overflow-hidden">
-              {/* Decorative Elements */}
-              <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -translate-y-10 translate-x-10"></div>
-              <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-8 -translate-x-8"></div>
-              
-              <div className="relative z-10">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-white/20 backdrop-blur-sm rounded-xl">
-                      <Message className="!w-6 !h-6 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="text-white font-bold text-lg">کانال های پین پارت</h3>
-                      <p className="text-blue-100 text-sm">دسترسی سریع به پشتیبانی</p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={handleClose}
-                    className="p-1.5 text-white/80 hover:text-white hover:bg-white/20 rounded-lg transition-colors"
-                    aria-label="بستن"
-                  >
-                    <Close className="!w-5 !h-5" />
-                  </button>
-                </div>
-                
-                {/* Pinpart Brand */}
-                <div className="flex items-center gap-2 px-3 py-2 bg-white/15 rounded-lg backdrop-blur-sm">
-                  <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                    <span className="text-blue-600 font-bold text-xs">PP</span>
+        <div className="fixed left-4 sm:left-6 bottom-24 z-[9998] animate-fade-in" dir="rtl">
+          <div className="bg-slate-950 rounded-3xl shadow-2xl border border-slate-800 overflow-hidden w-84 sm:w-96 max-h-[85vh] overflow-y-auto">
+            
+            {/* Drawer Header */}
+            <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-red-950 p-4 border-b border-slate-800 relative">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg border border-slate-700/60 shrink-0 overflow-hidden">
+                    <img 
+                      src="/logo.png" 
+                      alt="Pinpart Logo" 
+                      className="w-full h-full object-cover rounded-2xl"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = '/PinpartStore.JPEG';
+                      }}
+                    />
                   </div>
                   <div>
-                    <div className="text-white font-bold">Pinpart Store</div>
-                    <div className="text-blue-200 text-xs">تخصصی ترین فروشگاه لوازم یدکی</div>
+                    <div className="flex items-center gap-1.5">
+                      <h3 className="text-white font-black text-base">پین‌پارت</h3>
+                      <span className="px-2 py-0.5 bg-red-600 text-white text-[10px] font-bold rounded-md">عمده</span>
+                    </div>
+                    <p className="text-[11px] text-slate-300 mt-0.5">کانال‌های رسمی و پشتیبانی مستقیم</p>
                   </div>
                 </div>
+
+                <button
+                  onClick={handleClose}
+                  className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition"
+                  aria-label="بستن"
+                >
+                  <Close className="!w-5 !h-5" />
+                </button>
+              </div>
+
+              {/* Online Form Action Button inside Drawer */}
+              <div className="mt-3 pt-3 border-t border-slate-800/80">
+                <button
+                  onClick={() => {
+                    handleClose();
+                    setIsModalOpen(true);
+                  }}
+                  className="w-full py-2.5 px-3 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-xl text-xs font-bold transition shadow-md flex items-center justify-center gap-2"
+                >
+                  <MessageSquare className="h-4 w-4" />
+                  <span>ثبت آنلاین استعلام قیمت و پیش‌فاکتور</span>
+                </button>
               </div>
             </div>
 
             {/* Channels List */}
-            <div className="p-4">
-              <div className="space-y-3">
-                {socialChannels.map((channel) => (
-                  <button
-                    key={channel.id}
-                    onClick={() => handleChannelClick(channel.id, channel.url)}
-                    className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] ${
-                      activeChannel === channel.id
-                        ? 'border-blue-300 bg-blue-50 shadow-md'
-                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                    }`}
-                  >
-                    <div className={`p-3 rounded-lg ${channel.color} text-white transition-colors flex-shrink-0`}>
-                      {channel.icon}
-                    </div>
-                    <div className="flex-1 text-right min-w-0">
-                      <div className="flex items-center justify-between">
-                        <span className={`text-sm font-bold ${channel.textColor}`}>
-                          {channel.name}
-                        </span>
-                      </div>
-                      <div className="mt-1 flex items-center justify-between">
-                        <span className="text-xs text-gray-600 truncate max-w-[160px]">
-                          {channel.url.replace('https://', '')}
-                        </span>
-                        <OpenInNew className="!w-3 !h-3 text-gray-400 flex-shrink-0" />
-                      </div>
-                    </div>
-                  </button>
-                ))}
+            <div className="p-3.5 space-y-2.5">
+              <div className="text-[11px] font-bold text-slate-400 px-1">
+                شبکه‌ها و خطوط ارتباطی چراغ برق:
               </div>
 
-              {/* Quick Stats */}
-              <div className="mt-6 pt-4 border-t border-gray-200">
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="text-center p-3 bg-gradient-to-r from-green-50 to-green-100 rounded-lg border border-green-200">
-                    <div className="text-green-700 font-bold text-lg">۲ گروه</div>
-                    <div className="text-green-800 text-xs font-medium">واتساپ فعال</div>
+              {socialChannels.map((channel) => (
+                <button
+                  key={channel.id}
+                  onClick={() => handleChannelClick(channel.id, channel.url)}
+                  className={`w-full flex items-center gap-3 p-3 rounded-2xl border transition-all duration-200 text-right group ${
+                    activeChannel === channel.id
+                      ? 'border-red-500/80 bg-slate-900 shadow-md'
+                      : 'border-slate-800/80 bg-slate-900/60 hover:bg-slate-900 hover:border-slate-700'
+                  }`}
+                >
+                  <div className={`p-2.5 rounded-xl ${channel.color} text-white shadow-md shrink-0 group-hover:scale-105 transition-transform`}>
+                    {channel.icon}
                   </div>
-                  <div className="text-center p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border border-blue-200">
-                    <div className="text-blue-700 font-bold text-lg">۲ کانال</div>
-                    <div className="text-blue-800 text-xs font-medium">شبکه اجتماعی</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-white group-hover:text-red-400 transition-colors">
+                        {channel.name}
+                      </span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-slate-700">
+                        {channel.tag}
+                      </span>
+                    </div>
+                    <div className="text-[11px] text-slate-400 truncate mt-0.5">
+                      {channel.desc}
+                    </div>
                   </div>
+                </button>
+              ))}
+            </div>
+
+            {/* Quick Phones Footer */}
+            <div className="p-3.5 pt-2 bg-slate-900/40 border-t border-slate-800/80 text-xs">
+              <div className="bg-slate-900 p-2.5 rounded-xl border border-slate-800 flex items-center justify-between">
+                <div>
+                  <span className="text-slate-400 text-[11px] block">واحد فروش و استعلام عمده:</span>
+                  <a href="tel:09196408805" className="text-red-400 font-bold font-mono text-sm hover:underline">
+                    ۰۹۱۹۶۴۰۸۸۰۵
+                  </a>
                 </div>
-              </div>
-
-              {/* Contact Info */}
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <div className="text-center">
-                  <div className="text-xs text-gray-600 mb-2">پشتیبانی ۲۴ ساعته</div>
-                  <div className="flex flex-col gap-2 items-center">
-                    <div className="text-xs text-gray-700">
-                      <span className="font-bold">پشتیبانی:</span> ۰۹۱۹۶۴۰۸۸۰۵
-                    </div>
-                    <div className="text-xs text-gray-700">
-                      <span className="font-bold">مدیریت:</span> ۰۹۳۰۸۳۶۸۰۸۹
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Footer */}
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <p className="text-xs text-gray-600 text-center">
-                  © {new Date().getFullYear()} Pinpart Store - تمامی حقوق محفوظ است
-                </p>
+                <a
+                  href="tel:09196408805"
+                  className="px-3.5 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1 shadow-md font-mono"
+                >
+                  <Phone className="!w-3.5 !h-3.5" />
+                  <span>تماس</span>
+                </a>
               </div>
             </div>
+
           </div>
         </div>
       )}
@@ -214,51 +232,18 @@ const PinpartSocialToolbarFinal: React.FC = () => {
       {/* Backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/20 z-[9997] backdrop-blur-sm"
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[9997]"
           onClick={handleClose}
           aria-hidden="true"
         />
       )}
 
-      {/* Custom Animation */}
-      <style>
-        {`
-          @keyframes fade-in {
-            from {
-              opacity: 0;
-              transform: translateY(10px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-          .animate-fade-in {
-            animation: fade-in 0.3s ease-out;
-          }
-          
-          /* Scrollbar styling */
-          .overflow-y-auto::-webkit-scrollbar {
-            width: 6px;
-          }
-          .overflow-y-auto::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 3px;
-          }
-          .overflow-y-auto::-webkit-scrollbar-thumb {
-            background: #c1c1c1;
-            border-radius: 3px;
-          }
-          .overflow-y-auto::-webkit-scrollbar-thumb:hover {
-            background: #a1a1a1;
-          }
-          
-          /* Cursor pointer for all interactive elements */
-          button {
-            cursor: pointer;
-          }
-        `}
-      </style>
+      {/* Quote Inquiry Modal */}
+      <CallRequestModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        defaultPartName="استعلام از طریق نوار ارتباطی"
+      />
     </>
   );
 };

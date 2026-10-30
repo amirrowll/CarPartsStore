@@ -7,11 +7,17 @@ export interface CategoryHierarchy extends Category {
   children: CategoryHierarchy[];
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000/api';
+const getApiBaseUrl = () => {
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    return '/api';
+  }
+  return import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000/api';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  // Remove default Content-Type to allow multipart/form-data
 });
 
 // Add request interceptor to add JWT token
@@ -24,6 +30,11 @@ api.interceptors.request.use(
     // Don't override Content-Type if it's already set (for multipart/form-data)
     if (config.headers['Content-Type'] === undefined) {
       config.headers['Content-Type'] = 'application/json';
+    }
+    // Prevent stale browser caching on GET requests
+    if (config.method?.toLowerCase() === 'get') {
+      config.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
+      config.headers['Pragma'] = 'no-cache';
     }
     return config;
   },
@@ -149,20 +160,15 @@ export const productService = {
 };
 
 // Helper function to complete image URLs
-const completeImageUrl = (url: string | undefined): string => {
+export const completeImageUrl = (url: string | undefined | null): string => {
   if (!url) return '';
-  
-  // اگر آدرس کامل است (با http شروع شده) تغییر نده
-  if (url.startsWith('http')) return url;
-  
-  // اگر آدرس نسبی است، آن را با base URL کامل کن
-  // آدرس‌هایی که با /uploads/ شروع میشوند باید از ریشه سرور کامل شوند
-  if (url.startsWith('/uploads/')) {
-    return `${API_BASE_URL.replace('/api', '')}${url}`;
+  const cleanUrl = url.trim().replace(/\\/g, '/');
+  if (cleanUrl.startsWith('http://') || cleanUrl.startsWith('https://') || cleanUrl.startsWith('data:')) {
+    return cleanUrl;
   }
-  
-  // آدرس‌های دیگر را تغییر نده
-  return url;
+  const serverOrigin = API_BASE_URL.replace('/api', '').replace(/\/+$/, '');
+  const path = cleanUrl.startsWith('/') ? cleanUrl : `/${cleanUrl}`;
+  return `${serverOrigin}${path}`;
 };
 
 // Story API

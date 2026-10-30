@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { productApi } from '../services/api';
 import type { Product } from '../types';
-import { Star, ArrowLeft } from 'lucide-react';
+import { Star, ArrowLeft, Sparkles } from 'lucide-react';
 
 // Helper function to complete image URLs
 const completeImageUrl = (url: string | undefined): string => {
@@ -112,8 +112,8 @@ const AllFeaturedProductsPage: React.FC = () => {
 
         {products.length === 0 ? (
           <div className="mt-10 text-center py-16 bg-gray-50 rounded-2xl">
-            <div className="text-4xl mb-4">✨</div>
-            <h3 className="text-xl font-bold text-gray-700 mb-2">محصول ویژهای یافت نشد</h3>
+            <Sparkles className="h-12 w-12 text-amber-500 mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-gray-700 mb-2">محصول ویژه‌ای یافت نشد</h3>
             <p className="text-gray-500 mb-4">هیچ محصول ویژهای تعریف نشده است.</p>
             <Link 
               to="/admin/products/create" 

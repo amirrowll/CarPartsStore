@@ -19,7 +19,6 @@ namespace CarPartsStore.API.Controllers
         }
 
         [HttpGet]
-        [ResponseCache(Duration = 300, VaryByQueryKeys = new[] { "includeProducts" })]
         public async Task<IActionResult> GetCategories([FromQuery] bool includeProducts = false)
         {
             try
@@ -48,7 +47,6 @@ namespace CarPartsStore.API.Controllers
         }
 
         [HttpGet("hierarchy")]
-        [ResponseCache(Duration = 300)]
         public async Task<IActionResult> GetCategoryHierarchy()
         {
             try
@@ -120,7 +118,6 @@ namespace CarPartsStore.API.Controllers
         }
 
         [HttpGet("{id}/products")]
-        [ResponseCache(Duration = 60, VaryByQueryKeys = new[] { "page", "pageSize" })]
         public async Task<IActionResult> GetCategoryProducts(int id, [FromQuery] int page = 1, [FromQuery] int pageSize = 20)
         {
             try

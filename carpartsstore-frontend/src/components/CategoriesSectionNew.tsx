@@ -1,288 +1,184 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { useAppContext } from '../context/AppContext';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination, Autoplay } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-import type SwiperCore from 'swiper';
+import { Layers, Wrench, Shield, ArrowLeft, PackageCheck, Truck, FileSpreadsheet } from 'lucide-react';
 
-// Helper function to complete image URLs
-const completeImageUrl = (url: string | undefined): string => {
-  if (!url) return '';
-  
-  // If it's already a full URL (starts with http), don't change
-  if (url.startsWith('http')) return url;
-  
-  // If it's a relative path starting with /uploads/, complete it
-  if (url.startsWith('/uploads/')) {
-    return `http://127.0.0.1:5000${url}`;
-  }
-  
-  // For blob URLs (preview), return as-is
-  if (url.startsWith('blob:')) return url;
-  
-  // Return other URLs as-is
-  return url;
-};
+interface OfficialCategory {
+  id: number;
+  name: string;
+  subtitle: string;
+  badge: string;
+  icon: React.ReactNode;
+  features: string[];
+  image: string;
+}
 
-const categoryColors = [
-  'bg-gradient-to-br from-cyan-500 to-blue-600',
-  'bg-gradient-to-br from-orange-500 to-red-600',
-  'bg-gradient-to-br from-green-500 to-emerald-600',
-  'bg-gradient-to-br from-purple-500 to-pink-600',
-  'bg-gradient-to-br from-yellow-500 to-amber-600',
-  'bg-gradient-to-br from-indigo-500 to-violet-600',
-  'bg-gradient-to-br from-rose-500 to-pink-600',
-  'bg-gradient-to-br from-sky-500 to-cyan-600',
+const OFFICIAL_CATEGORIES: OfficialCategory[] = [
+  {
+    id: 10,
+    name: 'خارجات',
+    subtitle: 'انواع خار، بست، پین، قطعات پلیمری و فلزی فابریک بدنه، درب و موتور',
+    badge: 'تولید و تأمین دست‌اول',
+    icon: <Layers className="h-5 w-5 text-red-500" />,
+    features: ['خار آمپولی، کاپوت، رودری و رکاب', 'بست‌های شلنگ، لوله سوخت و سیم‌کشی', 'پلیمر مهندسی مقاوم در برابر حرارت و شکستگی'],
+    image: '/uploads/products/pinpart-1001.jpg',
+  },
+  {
+    id: 11,
+    name: 'پیچ و مهره',
+    subtitle: 'پیچ، مهره، واشر و اقلام اتصال گرید خودرویی با استاندارد DIN و ISO',
+    badge: 'گرید 8.8 و 10.9 فولادی',
+    icon: <Wrench className="h-5 w-5 text-amber-500" />,
+    features: ['پیچ سرسیلندر، طبق، چرخ و اکسل', 'مهره کاسه‌نمدی، واشر فنری و خورشیدی', 'پوشش گالوانیزه گرم و داکرومات ضدسایش'],
+    image: '/uploads/products/pinpart-1211.jpg',
+  },
+  {
+    id: 12,
+    name: 'آرم و علائم',
+    subtitle: 'انواع آرم، مارک، نوشته و علائم جلوپنجره، صندوق و رینگ چرخ خودرو',
+    badge: 'آبکاری کروم متالیک فابریک',
+    icon: <Shield className="h-5 w-5 text-blue-500" />,
+    features: ['آرم جلوپنجره، صندوق و رینگ چرخ', 'نوشته‌های فابریک برجسته خودروها', 'مقاوم در برابر شستشو، آفتاب و کدرشدگی'],
+    image: '/uploads/products/pinpart-1445.jpg',
+  },
 ];
 
 const CategoriesSectionNew: React.FC = () => {
-  const { categories, loading } = useAppContext();
-  const swiperRef = useRef<SwiperCore | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (swiperRef.current) {
-        swiperRef.current.destroy(true, true);
-      }
-    };
-  }, []);
-
-  if (loading) {
-    return (
-      <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              دسته بندی <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">محصولات</span>
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              در حال بارگذاری دسته بندیها...
-            </p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-              <div key={i} className="bg-white rounded-3xl shadow-xl p-8 animate-pulse">
-                <div className="h-16 w-16 bg-gray-200 rounded-2xl mb-6"></div>
-                <div className="h-6 bg-gray-200 rounded-xl mb-3"></div>
-                <div className="h-4 bg-gray-200 rounded mb-4"></div>
-                <div className="h-8 bg-gray-200 rounded-xl"></div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (categories.length === 0) {
-    return (
-      <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              دسته بندی <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">محصولات</span>
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-10">
-              به زودی دسته بندی محصولات اضافه خواهد شد.
-            </p>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
   return (
-    <section className="py-20 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            دسته بندی <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">محصولات</span>
+    <section id="categories-section" className="py-16 md:py-24 bg-slate-900 text-slate-100 relative overflow-hidden border-t border-slate-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        
+        {/* Section Header */}
+        <div className="flex flex-col items-center text-center mb-14">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-red-950/80 border border-red-800/60 text-red-400 text-xs font-bold mb-3 uppercase tracking-wider">
+            <span className="w-2 h-2 rounded-full bg-red-500"></span>
+            تولید و تأمین عمده ملزومات خودرویی
+          </div>
+
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight mb-3">
+            دسته‌بندی‌های تخصصی <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-rose-400">پین‌پارت</span>
           </h2>
-          <p className="text-center text-xl text-gray-600 max-w-3xl mx-auto">
-            قطعات یدکی خودرو در دسته بندی های تخصصی و مدرن
+          <p className="text-xs sm:text-sm md:text-base text-slate-300 max-w-2xl leading-relaxed">
+            فروش منحصراً عمده ۳ رسته اصلی قطعات خودرویی به قیمت همکاری، بدون واسطه و ارسال فوری به سراسر کشور
           </p>
         </div>
 
-        {/* Swiper Container */}
-        <div className="relative pb-24">
-          <Swiper
-            modules={[Navigation, Pagination, Autoplay]}
-            spaceBetween={30}
-            slidesPerView={1}
-            navigation={{
-              nextEl: '.custom-next',
-              prevEl: '.custom-prev',
-            }}
-            pagination={{
-              el: '.custom-pagination',
-              clickable: true,
-              bulletClass: 'custom-bullet',
-              bulletActiveClass: 'custom-bullet-active',
-            }}
-            autoplay={{
-              delay: 3000,
-              disableOnInteraction: false,
-            }}
-            breakpoints={{
-              640: {
-                slidesPerView: 2,
-                spaceBetween: 20,
-              },
-              768: {
-                slidesPerView: 3,
-                spaceBetween: 30,
-              },
-              1024: {
-                slidesPerView: 4,
-                spaceBetween: 30,
-              },
-            }}
-            onSwiper={(swiper) => {
-              swiperRef.current = swiper;
-            }}
-          >
-            {categories.map((category: any, index: number) => {
-              const color = categoryColors[index % categoryColors.length];
-              
-              return (
-                <SwiperSlide key={category.id}>
-                  <div className="relative bg-white rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:-translate-y-2 overflow-hidden group h-full">
-                    {/* Background Image with Gradient Overlay */}
-                    <div className="relative h-48 overflow-hidden rounded-t-3xl">
-                      <div 
-                        className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/50 to-transparent z-10"
-                      />
-                      {category.imageUrl ? (
-                        <img 
-                          src={completeImageUrl(category.imageUrl)} 
-                          alt={category.name}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).style.display = 'none';
-                          }}
-                        />
-                      ) : (
-                        <div className={`w-full h-full ${color} flex items-center justify-center`}>
-                          <span className="text-white text-2xl font-bold">
-                            {category.name.substring(0, 2)}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="p-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-xl font-bold text-gray-900 line-clamp-1">
-                          {category.name}
-                        </h3>
-                        <span className="text-sm font-bold text-gray-600 bg-gray-100 px-3 py-1 rounded-full whitespace-nowrap">
-                          {category.productCount || category.ProductCount || 0} محصول
-                        </span>
+        {/* 3 Cards Grid - Bright, Clean & High Definition */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {OFFICIAL_CATEGORIES.map((cat) => (
+            <div
+              key={cat.id}
+              className="group relative bg-slate-950/90 rounded-2xl border border-slate-800 hover:border-red-500/60 transition-all duration-300 hover:shadow-2xl hover:shadow-red-950/40 flex flex-col justify-between overflow-hidden"
+            >
+              {/* Visual Header with Clear Bright Image */}
+              <div className="relative h-48 overflow-hidden bg-white flex items-center justify-center p-2">
+                <img
+                  src={cat.image}
+                  alt={cat.name}
+                  className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                  loading="lazy"
+                  onError={(e) => {
+                    // Fallback to placeholder if upload not cached yet
+                    e.currentTarget.src = cat.id === 10 ? '/uploads/categories/kharejat.jpg' : cat.id === 11 ? '/uploads/categories/pich-mohre.jpg' : '/uploads/categories/arm.jpg';
+                  }}
+                />
+
+                {/* Top Badge */}
+                <div className="absolute top-3 right-3 flex items-center gap-1.5 px-2.5 py-1 bg-slate-950/90 backdrop-blur-md border border-slate-700 rounded-lg text-[11px] font-bold text-slate-200 shadow-md">
+                  {cat.icon}
+                  <span>{cat.badge}</span>
+                </div>
+              </div>
+
+              {/* Body Content */}
+              <div className="p-5 flex-1 flex flex-col justify-between space-y-4 bg-slate-900/90">
+                <div>
+                  <Link
+                    to={`/category/${cat.id}/${encodeURIComponent(cat.name)}`}
+                    className="group/title block"
+                  >
+                    <h3 className="text-xl font-black text-white group-hover/title:text-red-400 transition-colors flex items-center justify-between">
+                      <span>{cat.name}</span>
+                      <ArrowLeft className="h-4 w-4 text-slate-500 group-hover/title:translate-x-[-4px] transition-transform" />
+                    </h3>
+                  </Link>
+                  <p className="text-xs text-slate-300 mt-2 leading-relaxed">
+                    {cat.subtitle}
+                  </p>
+
+                  {/* Features List */}
+                  <div className="mt-4 pt-3 border-t border-slate-800 space-y-2">
+                    {cat.features.map((feat, i) => (
+                      <div key={i} className="flex items-start gap-2 text-[11px] text-slate-300">
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-500 mt-1 shrink-0"></span>
+                        <span className="line-clamp-1">{feat}</span>
                       </div>
-                      
-                      <p className="text-gray-600 mb-5 line-clamp-2 text-sm h-10">
-                        {category.description || 'دسته بندی تخصصی قطعات خودرو'}
-                      </p>
-                      
-                      <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                        <Link 
-                          to={`/category/${category.id}/${encodeURIComponent(category.name.replace(/\s+/g, '-'))}`}
-                          className="text-blue-600 font-bold hover:text-blue-700 flex items-center gap-2 transition-all text-sm"
-                        >
-                          مشاهده محصولات
-                          <svg className="w-4 h-4 rtl:rotate-180 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
-                          </svg>
-                        </Link>
-                        <span className="text-xs px-3 py-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-full">
-                          پرفروش
-                        </span>
-                      </div>
-                    </div>
+                    ))}
                   </div>
-                </SwiperSlide>
-              );
-            })}
-          </Swiper>
+                </div>
 
-          {/* Custom Navigation - Outside of cards */}
-          <div className="absolute bottom-4 left-0 right-0 z-10 flex items-center justify-center gap-8 mt-12">
-            {/* Previous Button */}
-            <button 
-              className="custom-prev w-10 h-10 bg-white rounded-full shadow-lg hover:shadow-xl border border-gray-200 hover:border-blue-500 transition-all flex items-center justify-center"
-              aria-label="قبلی"
-            >
-              <svg className="w-5 h-5 text-gray-700 hover:text-blue-600 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
+                {/* Car Brand Filter Direct Links */}
+                <div className="pt-3 border-t border-slate-800">
+                  <div className="text-[10px] text-slate-400 font-bold mb-2">فیلتر برند خودرو:</div>
+                  <div className="grid grid-cols-3 gap-1.5">
+                    <Link
+                      to={`/category/${cat.id}/${encodeURIComponent(cat.name)}?brand=saipa`}
+                      className="py-1.5 px-1 bg-slate-950 hover:bg-red-600/20 text-slate-300 hover:text-white border border-slate-800 hover:border-red-500/50 rounded-lg text-[10px] font-bold text-center transition-all"
+                    >
+                      سایپا
+                    </Link>
+                    <Link
+                      to={`/category/${cat.id}/${encodeURIComponent(cat.name)}?brand=irankhodro`}
+                      className="py-1.5 px-1 bg-slate-950 hover:bg-red-600/20 text-slate-300 hover:text-white border border-slate-800 hover:border-red-500/50 rounded-lg text-[10px] font-bold text-center transition-all"
+                    >
+                      ایران‌خودرو
+                    </Link>
+                    <Link
+                      to={`/category/${cat.id}/${encodeURIComponent(cat.name)}?brand=chinese`}
+                      className="py-1.5 px-1 bg-slate-950 hover:bg-red-600/20 text-slate-300 hover:text-white border border-slate-800 hover:border-red-500/50 rounded-lg text-[10px] font-bold text-center transition-all"
+                    >
+                      چینی
+                    </Link>
+                  </div>
 
-            {/* Pagination Dots */}
-            <div className="custom-pagination flex items-center gap-2">
-              {/* Dots will be injected here by Swiper */}
+                  {/* Main Category Action */}
+                  <Link
+                    to={`/category/${cat.id}/${encodeURIComponent(cat.name)}`}
+                    className="mt-3.5 w-full py-2.5 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-red-950/50 flex items-center justify-center gap-1.5"
+                  >
+                    <span>مشاهده کاتالوگ عمده {cat.name}</span>
+                    <ArrowLeft className="h-3.5 w-3.5" />
+                  </Link>
+                </div>
+              </div>
             </div>
+          ))}
+        </div>
 
-            {/* Next Button */}
-            <button 
-              className="custom-next w-10 h-10 bg-white rounded-full shadow-lg hover:shadow-xl border border-gray-200 hover:border-blue-500 transition-all flex items-center justify-center"
-              aria-label="بعدی"
-            >
-              <svg className="w-5 h-5 text-gray-700 hover:text-blue-600 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
+        {/* 3 Service Highlights with SVG Icons */}
+        <div className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-6 pt-10 border-t border-slate-800 text-center">
+          <div className="p-5 rounded-2xl bg-slate-950/60 border border-slate-800 flex flex-col items-center">
+            <div className="w-12 h-12 rounded-xl bg-red-500/10 text-red-400 flex items-center justify-center mb-3">
+              <PackageCheck className="h-6 w-6" />
+            </div>
+            <h4 className="text-sm font-bold text-white mb-1">بسته‌بندی استاندارد صادراتی</h4>
+            <p className="text-xs text-slate-400">بسته‌بندی کارتنی و سلفونی مقاوم مناسب قفسه‌بندی فروشگاهی</p>
           </div>
 
-          {/* Custom CSS */}
-          <style>
-            {`
-              .custom-pagination {
-                display: flex;
-                gap: 8px;
-              }
-              
-              .custom-bullet {
-                width: 10px;
-                height: 10px;
-                background: #d1d5db;
-                border-radius: 50%;
-                cursor: pointer;
-                transition: all 0.3s ease;
-                opacity: 0.7;
-              }
-              
-              .custom-bullet:hover {
-                background: #9ca3af;
-                opacity: 1;
-              }
-              
-              .custom-bullet-active {
-                background: #3b82f6;
-                opacity: 1;
-                transform: scale(1.2);
-              }
-              
-              .custom-prev:hover, .custom-next:hover {
-                transform: scale(1.1);
-                box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2);
-                border-color: #3b82f6;
-              }
-              
-              .swiper-button-disabled {
-                opacity: 0.3;
-                cursor: not-allowed;
-              }
-              
-              .swiper-button-disabled:hover {
-                transform: none;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-                border-color: #e5e7eb;
-              }
-            `}
-          </style>
+          <div className="p-5 rounded-2xl bg-slate-950/60 border border-slate-800 flex flex-col items-center">
+            <div className="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center mb-3">
+              <Truck className="h-6 w-6" />
+            </div>
+            <h4 className="text-sm font-bold text-white mb-1">توزیع سراسری روزانه</h4>
+            <p className="text-xs text-slate-400">ارسال بار به تمامی پایانه‌های باربری و دفاتر پستی تهران و شهرستان‌ها</p>
+          </div>
+
+          <div className="p-5 rounded-2xl bg-slate-950/60 border border-slate-800 flex flex-col items-center">
+            <div className="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center mb-3">
+              <FileSpreadsheet className="h-6 w-6" />
+            </div>
+            <h4 className="text-sm font-bold text-white mb-1">صدور پیش‌فاکتور رسمی</h4>
+            <p className="text-xs text-slate-400">امکان ثبت فاکتور شرکتی و همکاری برای فروشگاه‌ها و تعمیرگاه‌ها</p>
+          </div>
         </div>
       </div>
     </section>

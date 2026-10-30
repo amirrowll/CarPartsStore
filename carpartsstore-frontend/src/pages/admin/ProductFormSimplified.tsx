@@ -346,8 +346,9 @@ const ProductFormSimplified: React.FC = () => {
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                   {formData.imageFile && (
-                    <p className="text-xs text-green-600 mt-1">
-                      ✓ فایل انتخاب شده: {formData.imageFile.name} ({Math.round(formData.imageFile.size / 1024)}KB)
+                    <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                      <Check className="h-3.5 w-3.5" />
+                      <span>فایل انتخاب شده: {formData.imageFile.name} ({Math.round(formData.imageFile.size / 1024)}KB)</span>
                     </p>
                   )}
                 </div>

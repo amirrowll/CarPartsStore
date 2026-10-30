@@ -20,6 +20,7 @@ const AdminOrders = lazy(() => import('./pages/admin/Orders'));
 const AdminUsers = lazy(() => import('./pages/admin/Users'));
 const AdminStories = lazy(() => import('./pages/admin/Stories'));
 const StoryForm = lazy(() => import('./pages/admin/StoryForm'));
+const AdminCallRequests = lazy(() => import('./pages/admin/CallRequests'));
 const ProductsPageImproved = lazy(() => import('./pages/ProductsPageImproved'));
 const ProductDetailPage = lazy(() => import('./pages/ProductDetailPage'));
 const ChinesePartsPage = lazy(() => import('./pages/ChinesePartsPage'));
@@ -42,11 +43,14 @@ const LoadingFallback = () => (
   </div>
 );
 
+import ScrollToTop from './components/ScrollToTop';
+
 function App() {
   return (
     <AuthProvider>
       <AppProvider>
         <Router>
+          <ScrollToTop />
           <Suspense fallback={<LoadingFallback />}>
             <Routes>
               {/* Admin Login Page - بدون لایه اصلی */}
@@ -57,6 +61,7 @@ function App() {
                 <Route index element={<HomePage />} />
                 <Route path="products" element={<ProductsPageImproved />} />
                 <Route path="products/:id" element={<ProductDetailPage />} />
+                <Route path="product/:id" element={<ProductDetailPage />} />
                 <Route path="products/category/:categoryId" element={<ProductsPageImproved />} />
                 <Route path="category/:id/:name" element={<ProductsPageImproved />} />
                 <Route path="chinese-parts" element={<ChinesePartsPage />} />
@@ -82,6 +87,7 @@ function App() {
                 <Route path="stories" element={<AdminStories />} />
                 <Route path="stories/create" element={<StoryForm />} />
                 <Route path="stories/edit/:id" element={<StoryForm />} />
+                <Route path="call-requests" element={<AdminCallRequests />} />
               </Route>
               <Route path="*" element={<NotFoundPage />} />
             </Routes>

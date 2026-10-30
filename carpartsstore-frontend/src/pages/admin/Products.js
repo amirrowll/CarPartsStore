@@ -69,9 +69,11 @@ const Products = () => {
         }
     };
     const handleToggleFeatured = async (productId, currentStatus) => {
+        const newStatus = !currentStatus;
+        setProducts(prev => prev.map(p => p.id === productId ? { ...p, isFeatured: newStatus } : p));
         try {
             const formData = new FormData();
-            formData.append('isFeatured', (!currentStatus).toString());
+            formData.append('isFeatured', newStatus.toString());
             await api.put(`/products/${productId}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
@@ -82,12 +84,15 @@ const Products = () => {
         catch (err) {
             setError('خطا در تغییر وضعیت محصول ویژه');
             console.error('Toggle featured error:', err);
+            fetchProducts();
         }
     };
     const handleToggleActive = async (productId, currentStatus) => {
+        const newStatus = !currentStatus;
+        setProducts(prev => prev.map(p => p.id === productId ? { ...p, isActive: newStatus } : p));
         try {
             const formData = new FormData();
-            formData.append('isActive', (!currentStatus).toString());
+            formData.append('isActive', newStatus.toString());
             await api.put(`/products/${productId}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
@@ -98,6 +103,7 @@ const Products = () => {
         catch (err) {
             setError('خطا در تغییر وضعیت فعال بودن محصول');
             console.error('Toggle active error:', err);
+            fetchProducts();
         }
     };
     const clearFilters = () => {
@@ -220,7 +226,6 @@ const Products = () => {
                   {/* Product Info */}
                   <div className="p-4">
                     <h4 className="font-semibold text-gray-800 mb-2 line-clamp-1">{product.name}</h4>
-                    <p className="text-sm text-gray-600 mb-3 line-clamp-2">{product.description}</p>
                     
                     {/* Product Details */}
                     <div className="space-y-2 mb-4">

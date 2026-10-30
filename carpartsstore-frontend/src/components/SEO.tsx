@@ -2,12 +2,12 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
 const SITE_URL = 'https://pinparts.ir';
-const SITE_NAME = 'Pinpart Store';
-const DEFAULT_IMAGE = `${SITE_URL}/PinpartStore.JPEG`;
-const DEFAULT_TITLE = 'Pinpart Store - فروشگاه تخصصی قطعات یدکی خودرو | سایپا، ایران خودرو، چینی';
-const DEFAULT_DESC = 'فروشگاه تخصصی قطعات یدکی خودرو - لوازم سایپا، ایران خودرو و چینی با بهترین قیمت و کیفیت. بیش از 15 سال تجربه در تامین قطعات اصلی.';
-const DEFAULT_KEYWORDS = 'قطعات یدکی, لوازم سایپا, لوازم ایران خودرو, لوازم چینی, خودرو, قطعات خودرو, فروشگاه قطعات, پین پارت, لنت ترمز, فیلتر هوا, شمع, روغن موتور, پراید, تیبا, پژو, سمند';
-const DEFAULT_AUTHOR = 'Pinpart Store';
+const SITE_NAME = 'پین‌ پارت (Pinparts)';
+const DEFAULT_IMAGE = `${SITE_URL}/logo.jpg`;
+const DEFAULT_TITLE = 'خارجات ماشین و لوازم یدکی خودرو | خرید عمده خار و بست چراغ برق | پین پارت';
+const DEFAULT_DESC = 'بزرگترین مرکز تولید و پخش عمده خارجات ماشین، انواع خار و بست پلیمری و فلزی خودرو، پیچ و مهره استاندارد، سوکت سیم‌کشی و لوازم یدکی ایران خودرو، سایپا و خودروهای چینی در بازار چراغ برق تهران با بهترین قیمت دست‌اول در پین پارت.';
+const DEFAULT_KEYWORDS = 'خارجات ماشین, لوازم یدکی خودرو, لوازم یدکی, خارجات خودرو, لوازم یدکی ماشین, خرید عمده لوازم یدکی, خار خودرو, خار و بست, خار تودری, خار آمپولی, خار شلگیر, پیچ و مهره خودرو, پیچ و مهره ماشین, سوکت ماشین, سوکت خودرو, اتصالات خودرو, لوازم یدکی ایران خودرو, لوازم یدکی سایپا, لوازم یدکی چینی, بازار چراغ برق تهران, پین پارت, Pinparts';
+const DEFAULT_AUTHOR = 'پین پارت | Pinparts';
 const DEFAULT_LOCALE = 'fa_IR';
 
 interface SEOProps {
@@ -55,7 +55,9 @@ const SEO: React.FC<SEOProps> = ({
 }) => {
   const location = useLocation();
   const canonicalUrl = `${SITE_URL}${location.pathname}`;
-  const fullTitle = title ? `${title} | ${SITE_NAME}` : DEFAULT_TITLE;
+  const fullTitle = title 
+    ? (title.includes('پین پارت') || title.includes('پین‌ پارت') || title.includes('Pinparts') ? title : `${title} | ${SITE_NAME}`)
+    : DEFAULT_TITLE;
   const desc = description || DEFAULT_DESC;
   const kw = keywords || DEFAULT_KEYWORDS;
   const img = image.startsWith('http') ? image : `${SITE_URL}${image}`;
@@ -72,9 +74,6 @@ const SEO: React.FC<SEOProps> = ({
     setMeta('meta[name="googlebot"]', 'name', 'index, follow');
     setMeta('meta[name="bingbot"]', 'name', 'index, follow');
     setLink('canonical', canonicalUrl);
-    
-    // Hreflang برای زبان فارسی
-    setLink('alternate', canonicalUrl);
     
     // Set hreflang attributes
     const setHreflang = (lang: string, href: string) => {
